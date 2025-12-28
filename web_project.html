@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Pharmacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background: radial-gradient(circle at 8% 10%, #e0f2fe 0, transparent 20%), radial-gradient(circle at 82% 8%, #fce7f3 0, transparent 22%), linear-gradient(160deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%); }
+        .btn-primary { background-color: #0ea5e9; color: white; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s; box-shadow: 0 10px 30px rgba(14,165,233,0.25); }
+        .btn-primary:hover { background-color: #0284c7; transform: translateY(-1px); box-shadow: 0 14px 40px rgba(14,165,233,0.28); }
+        .card { background-color: rgba(255,255,255,0.9); border-radius: 0.9rem; box-shadow: 0 10px 30px rgba(15,23,42,0.08); backdrop-filter: blur(6px); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 20px 45px rgba(15,23,42,0.12); }
+        .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.9rem; border-radius: 9999px; background: rgba(255,255,255,0.85); color: #0ea5e9; font-weight: 700; box-shadow: 0 10px 30px rgba(255,255,255,0.35); }
+        .pill { border-radius: 9999px; padding: 0.3rem 0.75rem; font-weight: 600; font-size: 0.8rem; }
+        .section-lead { color: #0f172a; font-weight: 700; letter-spacing: -0.01em; }
+        .category-card { position: relative; overflow: hidden; color: white; min-height: 180px; }
+        .category-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.65) 100%); }
+        .category-content { position: relative; z-index: 1; }
+        .product-photo { height: 150px; border-radius: 0.75rem; background-size: cover; background-position: center; background-color: #e2e8f0; }
+        .search-shell { box-shadow: 0 14px 45px rgba(15,23,42,0.08); }
+        .pill-soft { background: rgba(14,165,233,0.08); color: #0369a1; border: 1px solid rgba(14,165,233,0.16); }
+        .chip { border: 1px solid rgba(15,23,42,0.08); padding: 0.35rem 0.85rem; border-radius: 999px; background: rgba(255,255,255,0.75); font-weight: 700; font-size: 0.85rem; color: #0f172a; transition: all 0.15s ease; box-shadow: 0 8px 20px rgba(15,23,42,0.08); }
+        .chip:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(15,23,42,0.12); }
+        .chip.active { background: linear-gradient(120deg, #0ea5e9, #0284c7); color: white; border-color: transparent; }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full bg-white/85 backdrop-blur shadow z-40">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold flex items-center gap-2 text-slate-900">💊 Wellness</div>
+            <div class="flex gap-6 items-center text-sm font-semibold">
+                <a href="#home" class="text-slate-700 hover:text-sky-600">Home</a>
+                <a href="#shop" class="text-slate-700 hover:text-sky-600">Shop</a>
+                <button onclick="toggleCart()" class="relative text-slate-700 hover:text-sky-600">
+                    🛒
+                    <span id="cartCount" class="hidden absolute -top-2 -right-2 bg-rose-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+                <div id="authButtons" class="flex gap-3">
+                    <button onclick="openModal('login')" class="text-slate-700 hover:text-sky-600">Log In</button>
+                    <button onclick="openModal('signup')" class="btn-primary px-4 py-2 rounded-lg">Sign Up</button>
+                </div>
+                <div id="userMenu" class="hidden flex gap-3 items-center">
+                    <span class="text-slate-700">👤 <span id="userName">User</span></span>
+                    <button onclick="handleLogout()" class="text-slate-700 hover:text-rose-600">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="relative isolate overflow-hidden pt-24 pb-20 text-white" id="home"
+        style="background-image: linear-gradient(135deg, rgba(14,165,233,0.85), rgba(14,116,144,0.85)), url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80'); background-size: cover; background-position: center;">
+        <div class="absolute inset-0 bg-gradient-to-br from-sky-900/30 via-sky-800/25 to-slate-900/20"></div>
+        <div class="max-w-6xl mx-auto px-4 relative z-10">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="space-y-6">
+                    <span class="hero-badge">Trusted care • 24/7</span>
+                    <h1 class="text-4xl md:text-5xl font-black leading-tight">Modern pharmacy for everyday wellbeing.</h1>
+                    <p class="text-lg text-sky-50/90 max-w-xl">Clinical-grade medications, vitamins, and wellness essentials delivered with pharmacist oversight and transparent pricing.</p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="#shop" class="btn-primary px-6 py-3 rounded-xl inline-flex items-center gap-2">Shop Now <span>→</span></a>
+                       
+                        
+                    </div>
+                </div>
+                <div class="card p-6 bg-white/90 text-slate-900 shadow-xl">
+                    <p class="text-sm font-semibold text-sky-600 mb-2">Care at a glance</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="text-3xl font-bold text-slate-900">200</p>
+                            <p class="text-slate-600">Products in catalog</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="text-3xl font-bold text-slate-900">4</p>
+                            <p class="text-slate-600">Wellness categories</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="text-3xl font-bold text-slate-900">Fast</p>
+                            <p class="text-slate-600">Online checkout</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="text-3xl font-bold text-slate-900">Rx</p>
+                            <p class="text-slate-600">Guidance ready</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SHOP -->
+    <section class="py-16 px-4 max-w-6xl mx-auto" id="shop">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <p class="uppercase tracking-[0.18em] text-xs text-slate-500">Catalog</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-1 section-lead">Browse Categories</h2>
+            </div>
+            <span class="text-xs font-semibold bg-slate-900 text-white px-3 py-1 rounded-full">Curated for wellness</span>
+        </div>
+        <div class="grid md:grid-cols-4 gap-6 mb-12" id="categoriesGrid"></div>
+
+        <div class="flex flex-wrap gap-3 mb-8" id="categoryChips"></div>
+
+        <div class="flex items-center justify-between mb-4 mt-12 flex-wrap gap-3">
+            <div>
+            
+                <h2 class="text-3xl md:text-4xl font-extrabold mt-1 section-lead">Shop Products</h2>
+                
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="resultCount" class="text-xs bg-sky-100 text-sky-700 font-semibold px-3 py-1 rounded-full">Loading...</span>
+            </div>
+        </div>
+        <div class="search-shell flex w-full gap-3 px-4 py-3 border border-slate-200 rounded-xl mb-8 bg-white items-center">
+            <span class="text-slate-500 text-lg">🔍</span>
+            <input type="text" id="searchBox" placeholder="Search medicines, brands, or category" class="w-full outline-none" aria-label="Search products">
+            <button id="clearSearch" class="text-sm font-semibold text-slate-600 hover:text-rose-600 hidden">Clear</button>
+        </div>
+        
+        <div class="grid md:grid-cols-4 gap-6 mb-12" id="productGrid"></div>
+    </section>
+
+    <!-- CART SIDEBAR -->
+    <div id="cartSidebar" class="hidden fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 overflow-y-auto pt-16">
+        <div class="p-6 border-b sticky top-16 bg-white">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Shopping Cart</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
+            </div>
+        </div>
+        
+        <div id="cartItems" class="p-6 space-y-4 min-h-64">
+            <p class="text-center text-gray-500">Your cart is empty</p>
+        </div>
+        
+        <div id="cartFooter" class="hidden border-t p-6 sticky bottom-0 bg-white">
+            <div class="flex justify-between mb-4 text-lg font-bold">
+                <span>Total:</span>
+                <span id="cartTotal">L.E 0.00</span>
+            </div>
+            <button onclick="proceedToCheckout()" class="btn-primary w-full text-white font-bold py-3 rounded-lg mb-2">Proceed to Checkout</button>
+            <button onclick="toggleCart()" class="w-full text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- CART OVERLAY -->
+    <div id="cartOverlay" class="hidden fixed inset-0 bg-black/30 z-40" onclick="toggleCart()"></div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-400 py-12 mt-16">
+        <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h3 class="text-white font-bold mb-3">💊 Wellness</h3>
+                <p class="text-sm">Your trusted healthcare partner delivering quality medications and supplements.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Quick Links</h4>
+                <ul class="space-y-1 text-sm">
+                    <li><a href="#home" class="hover:text-white">Home</a></li>
+                    <li><a href="#shop" class="hover:text-white">Shop</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Support</h4>
+                <ul class="space-y-1 text-sm">
+                    <li><a href="#" class="hover:text-white">Help Center</a></li>
+                    <li><a href="#" class="hover:text-white">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-3">Legal</h4>
+                <ul class="space-y-1 text-sm">
+                    <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-8 text-center text-sm">
+            <p>&copy; WELLNESS PHARMACY 2025 . MOHAMED HESHAM FAROUK . ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="modal" class="hidden fixed inset-0 modal-backdrop flex justify-center items-center z-50" onclick="if(event.target===this) closeModal()">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ==================== DATA ====================
+        // Local fallback data (used when server is unavailable)
+        const fallbackData = {
+            products: [
+                { id: 1, name: 'Lisinopril 10mg', price: 12.99, rx: true, cat: 'vitals', desc: 'Blood pressure support' },
+                { id: 2, name: 'Atorvastatin 20mg', price: 18.50, rx: true, cat: 'vitals', desc: 'Cholesterol control' },
+                { id: 3, name: 'Metformin 500mg', price: 14.99, rx: true, cat: 'vitals', desc: 'Diabetes management' },
+                { id: 4, name: 'Amlodipine 5mg', price: 16.75, rx: true, cat: 'vitals', desc: 'Heart health support' },
+                { id: 5, name: 'Aspirin 81mg', price: 8.99, rx: false, cat: 'vitals', desc: 'Heart & pain relief' },
+                { id: 6, name: 'Omeprazole 20mg', price: 11.50, rx: false, cat: 'vitals', desc: 'Acid reflux relief' },
+                { id: 7, name: 'Losartan 50mg', price: 15.99, rx: true, cat: 'vitals', desc: 'Blood pressure control' },
+                { id: 8, name: 'Metoprolol 25mg', price: 13.50, rx: true, cat: 'vitals', desc: 'Heart rate management' },
+                { id: 9, name: 'Vitamin D3 5000IU', price: 14.99, rx: false, cat: 'vitamins', desc: 'Bone health & immunity' },
+                { id: 10, name: 'Multivitamin', price: 22.50, rx: false, cat: 'vitamins', desc: 'Daily essentials' },
+                { id: 11, name: 'Vitamin B12 Complex', price: 11.99, rx: false, cat: 'vitamins', desc: 'Energy & nerve health' },
+                { id: 12, name: 'Zinc Supplements', price: 9.99, rx: false, cat: 'vitamins', desc: 'Immune system boost' },
+                { id: 13, name: 'Vitamin C 1000mg', price: 10.50, rx: false, cat: 'vitamins', desc: 'Immune support' },
+                { id: 14, name: 'Omega-3 Fish Oil', price: 19.99, rx: false, cat: 'vitamins', desc: 'Heart & brain health' },
+                { id: 15, name: 'Calcium + Vitamin D', price: 16.75, rx: false, cat: 'vitamins', desc: 'Bone strength' },
+                { id: 16, name: 'Iron Supplement', price: 12.50, rx: false, cat: 'vitamins', desc: 'Energy & stamina' },
+                { id: 17, name: 'Premium Whey Protein', price: 45.99, rx: false, cat: 'fitness', desc: '25g protein/serving' },
+                { id: 18, name: 'Creatine Monohydrate', price: 24.99, rx: false, cat: 'fitness', desc: 'Muscle performance' },
+                { id: 19, name: 'BCAAs 2:1:1', price: 32.50, rx: false, cat: 'fitness', desc: 'Recovery & muscle' },
+                { id: 20, name: 'Pre-Workout Formula', price: 38.99, rx: false, cat: 'fitness', desc: 'Energy & endurance' },
+                { id: 21, name: 'Mass Gainer', price: 54.99, rx: false, cat: 'fitness', desc: 'Weight & muscle gain' },
+                { id: 22, name: 'Glutamine Powder', price: 29.99, rx: false, cat: 'fitness', desc: 'Recovery support' },
+                { id: 23, name: 'Whey Isolate', price: 52.50, rx: false, cat: 'fitness', desc: '30g pure protein' },
+                { id: 24, name: 'Caffeine Pills', price: 14.99, rx: false, cat: 'fitness', desc: 'Energy boost' },
+                { id: 25, name: 'Hydrating Serum', price: 28.99, rx: false, cat: 'cosmetics', desc: 'Hyaluronic acid formula' },
+                { id: 26, name: 'SPF 50 Sunscreen', price: 19.99, rx: false, cat: 'cosmetics', desc: 'UV protection' },
+                { id: 27, name: 'Anti-Aging Moisturizer', price: 35.50, rx: false, cat: 'cosmetics', desc: 'Collagen-infused cream' },
+                { id: 28, name: 'Face Wash Gel', price: 12.99, rx: false, cat: 'cosmetics', desc: 'Deep cleansing' },
+                { id: 29, name: 'Retinol Night Cream', price: 42.99, rx: false, cat: 'cosmetics', desc: 'Anti-wrinkle formula' },
+                { id: 30, name: 'Eye Cream', price: 24.50, rx: false, cat: 'cosmetics', desc: 'Dark circle remover' },
+                { id: 31, name: 'Lip Balm SPF30', price: 8.99, rx: false, cat: 'cosmetics', desc: 'Moisturizing protection' },
+                { id: 32, name: 'Face Mask Peel', price: 16.75, rx: false, cat: 'cosmetics', desc: 'Deep cleansing treatment' }
+            ],
+            cats: [
+                { id: 'vitals', name: 'Vital Medications', icon: '💊' },
+                { id: 'vitamins', name: 'Vitamins', icon: '🥗' },
+                { id: 'fitness', name: 'Fitness', icon: '💪' },
+                { id: 'cosmetics', name: 'Cosmetics', icon: '✨' }
+            ]
+        };
+
+        const CURRENCY = 'L.E';
+        const formatPrice = (value) => `${CURRENCY} ${parseFloat(value || 0).toFixed(2)}`;
+
+        // Visual theme imagery
+        const themeImages = {
+            hero: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1600&q=80',
+            product: 'https://images.unsplash.com/photo-1584362917165-526a968579e8?auto=format&fit=crop&w=1200&q=80',
+            categories: {
+                vitals: 'https://images.unsplash.com/photo-1584362917165-526a968579e8?auto=format&fit=crop&w=1400&q=80',
+                vitamins: 'https://images.unsplash.com/photo-1478144592103-25e218a04891?auto=format&fit=crop&w=1200&q=80',
+                fitness: 'https://images.everydayhealth.com/images/healthy-living/fitness/everything-you-need-know-about-fitness-1440x810.jpg?sfvrsn=2fee0a3b_5',
+                cosmetics: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1200&q=80'
+            }
+        };
+
+        // Dynamic data from server
+        const db = {
+            products: [],
+            cats: fallbackData.cats
+        };
+
+        let user = JSON.parse(localStorage.getItem('wp_user')) || null;
+        let cart = JSON.parse(localStorage.getItem('wp_cart')) || [];
+        let isOnline = true;
+        let activeCategory = null;
+
+        // ==================== API HELPERS ====================
+        async function fetchFromAPI(endpoint, options = {}) {
+            try {
+                const response = await fetch(API_BASE_URL + endpoint, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                console.warn('API Error:', error);
+                isOnline = false;
+                return null;
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        window.onload = async () => {
+            const searchBox = document.getElementById('searchBox');
+            const clearSearch = document.getElementById('clearSearch');
+
+            await loadProducts();
+            await loadCategories();
+
+            renderCategories();
+            renderCategoryChips();
+            renderProducts();
+            updateAuth();
+            updateCart();
+
+            let debounceId;
+            searchBox.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                clearSearch.classList.toggle('hidden', !term);
+                clearTimeout(debounceId);
+                debounceId = setTimeout(() => renderProducts(term), 180);
+            });
+
+            clearSearch.addEventListener('click', () => {
+                searchBox.value = '';
+                clearSearch.classList.add('hidden');
+                renderProducts('');
+            });
+        };
+
+        function normalizeProductList(list) {
+            return (list || []).map(p => ({
+                ...p,
+                id: p.id != null ? String(p.id) : (p._id != null ? String(p._id) : null)
+            }));
+        }
+
+        async function loadProducts() {
+            const result = await fetchFromAPI('/products');
+            if (result && result.success && result.data) {
+                db.products = normalizeProductList(result.data);
+                isOnline = true;
+            } else {
+                db.products = normalizeProductList(fallbackData.products);
+                console.log('Using fallback product data');
+            }
+        }
+
+        async function loadCategories() {
+            const result = await fetchFromAPI('/categories');
+            if (result && result.success && result.data) {
+                db.cats = result.data;
+            } else {
+                db.cats = fallbackData.cats;
+            }
+        }
+
+        // ==================== CATEGORIES ====================
+        function renderCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = db.cats.map(cat => {
+                const bg = themeImages.categories[cat.id] || themeImages.product;
+                return `
+                    <button onclick="filterByCategory('${cat.id}')" class="card category-card p-6 text-left hover:scale-[1.02] transition" style="background-image: linear-gradient(160deg, rgba(15,23,42,0.3), rgba(15,23,42,0.65)), url('${bg}'); background-size: cover; background-position: center;">
+                        <div class="category-content">
+                            <div class="text-4xl mb-3">${cat.icon}</div>
+                            <h3 class="font-bold text-lg">${cat.name}</h3>
+                            <p class="text-sm text-slate-100/90 mt-1">Shop curated ${cat.name.toLowerCase()}</p>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderCategoryChips() {
+            const wrap = document.getElementById('categoryChips');
+            if (!wrap) return;
+            const chips = [{ id: null, name: 'All', icon: '🌐' }, ...db.cats];
+            wrap.innerHTML = chips.map(cat => {
+                const chipId = cat.id ?? 'all';
+                const isActive = activeCategory ? activeCategory === cat.id : chipId === 'all';
+                const icon = cat.icon || '💊';
+                return `<button data-chip-id="${chipId}" class="chip ${isActive ? 'active' : ''}" onclick="setCategory('${chipId}')">${icon} ${cat.name || 'All Products'}</button>`;
+            }).join('');
+        }
+
+        function updateChipState() {
+            document.querySelectorAll('[data-chip-id]').forEach(btn => {
+                const id = btn.getAttribute('data-chip-id');
+                const isActive = (!activeCategory && id === 'all') || (activeCategory && id === activeCategory);
+                btn.classList.toggle('active', isActive);
+            });
+        }
+
+        function setCategory(catId) {
+            activeCategory = catId === 'all' ? null : catId;
+            document.getElementById('searchBox').value = '';
+            document.getElementById('clearSearch').classList.add('hidden');
+            updateChipState();
+            renderProducts('');
+        }
+
+        function filterByCategory(catId) { setCategory(catId); }
+
+        // ==================== PRODUCTS ====================
+        function renderProducts(search = '') {
+            const term = (search || '').toLowerCase();
+            
+            // Always filter from already-loaded & normalized db.products for cart compatibility
+            let products = db.products.filter(p => {
+                const matchSearch = term ? (p.name?.toLowerCase().includes(term) || p.desc?.toLowerCase().includes(term)) : true;
+                    const matchCat = activeCategory ? p.cat === activeCategory : true;
+                    return matchSearch && matchCat;
+            });
+
+            const grid = document.getElementById('productGrid');
+            if (!products.length) {
+                grid.innerHTML = emptyState('No products match your search. Try another term.');
+            } else {
+                grid.innerHTML = products.map(p => productCardTemplate(p)).join('');
+            }
+
+            const labelParts = [];
+            if (term) labelParts.push(`for “${term}”`);
+            if (activeCategory) labelParts.push(`in ${getCategoryName(activeCategory)}`);
+            const label = labelParts.length ? labelParts.join(' ') : 'All products';
+            updateResultCount(products.length, label);
+        }
+
+        function emptyState(message) {
+            return `<div class="col-span-4 text-center text-slate-500 py-10">${message}</div>`;
+        }
+
+        function getCategoryName(catId) {
+            return db.cats.find(c => c.id === catId)?.name || 'this category';
+        }
+
+        function updateResultCount(count, label) {
+            const badge = document.getElementById('resultCount');
+            if (!badge) return;
+            badge.textContent = `${count} results` + (label ? ` • ${label}` : '');
+        }
+
+        function normalizeId(p) {
+            const raw = p?.id ?? p?._id;
+            return raw != null ? String(raw) : null;
+        }
+
+        function productCardTemplate(p) {
+            const pid = normalizeId(p);
+            const bg = themeImages.categories[p.cat] || themeImages.product;
+            const catName = db.cats.find(c => c.id === p.cat)?.name || 'Wellness';
+            return `
+                <div class="card p-5 flex flex-col gap-4">
+                    <div class="product-photo w-full" style="background-image: linear-gradient(135deg, rgba(15,23,42,0.2), rgba(15,23,42,0.45)), url('${bg}');"></div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">${catName}</p>
+                            <h3 class="font-bold text-lg text-slate-900 mt-1">${p.name}</h3>
+                        </div>
+                        ${p.rx ? '<span class="pill bg-slate-900 text-white">Rx</span>' : '<span class="pill bg-sky-100 text-sky-700">OTC</span>'}
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed">${p.desc}</p>
+                    <div class="flex items-center justify-between mt-auto pt-2">
+                        <p class="text-2xl font-bold text-sky-700">${formatPrice(p.price)}</p>
+                        <button onclick="addCart('${pid}')" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">Add</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== CART ====================
+        function addCart(id) {
+            // Support both string UUIDs and numeric IDs
+            const prod = db.products.find(p => String(p.id ?? p._id) === String(id));
+            if(!prod) { alert('❌ Product not found'); return; }
+            const canonicalId = String(prod.id ?? prod._id);
+            const item = cart.find(c => String(c.id) === canonicalId);
+            if(item) item.qty++; 
+            else cart.push({ ...prod, id: canonicalId, qty: 1 });
+            localStorage.setItem('wp_cart', JSON.stringify(cart));
+            updateCart();
+            alert(`✅ "${prod.name}" added to cart!`);
+        }
+
+        function removeCart(id) {
+            cart = cart.filter(c => String(c.id) !== String(id));
+            localStorage.setItem('wp_cart', JSON.stringify(cart));
+            updateCart();
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(c => String(c.id) === String(id));
+            if(!item) return;
+            item.qty += change;
+            if(item.qty <= 0) removeCart(id);
+            else {
+                localStorage.setItem('wp_cart', JSON.stringify(cart));
+                updateCart();
+            }
+        }
+
+        function updateCart() {
+            const items = document.getElementById('cartItems');
+            const count = document.getElementById('cartCount');
+            const footer = document.getElementById('cartFooter');
+            const total = document.getElementById('cartTotal');
+
+            const qty = cart.reduce((s, c) => s + c.qty, 0);
+            if(qty) {
+                count.textContent = qty;
+                count.classList.remove('hidden');
+            } else count.classList.add('hidden');
+
+            if(!cart.length) {
+                items.innerHTML = '<p class="text-center text-gray-500">Your cart is empty</p>';
+                footer.classList.add('hidden');
+            } else {
+                items.innerHTML = cart.map(c => `
+                    <div class="border rounded p-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">${c.name}</p>
+                            <p class="text-gray-600 text-sm">${formatPrice(c.price)} each</p>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <button onclick="updateQuantity('${c.id}', -1)" class="bg-gray-200 px-2 py-1 rounded">-</button>
+                            <span class="font-bold w-8 text-center">${c.qty}</span>
+                            <button onclick="updateQuantity('${c.id}', 1)" class="bg-gray-200 px-2 py-1 rounded">+</button>
+                            <button onclick="removeCart('${c.id}')" class="text-red-500 font-bold">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+                footer.classList.remove('hidden');
+                const cartTotal = cart.reduce((s, c) => s + parseFloat(c.price) * c.qty, 0);
+                total.textContent = formatPrice(cartTotal);
+            }
+        }
+
+        function toggleCart() {
+            document.getElementById('cartSidebar').classList.toggle('hidden');
+            document.getElementById('cartOverlay').classList.toggle('hidden');
+        }
+
+        // ==================== AUTHENTICATION ====================
+        function getUsers() { return JSON.parse(localStorage.getItem('wp_users_db')) || {}; }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail')?.value?.toLowerCase().trim();
+            const pass = document.getElementById('loginPass')?.value;
+            if(!email || !pass) { alert('❌ Please enter email and password'); return; }
+            try {
+                const response = await fetch(API_BASE_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, pass })
+                });
+                const data = await response.json();
+                if(data.success) {
+                    user = data.user;
+                    localStorage.setItem('wp_user', JSON.stringify(user));
+                    updateAuth();
+                    closeModal();
+                    alert('✅ Logged in successfully!');
+                } else alert('❌ ' + (data.error || 'Login failed'));
+            } catch(error) {
+                const users = getUsers();
+                if(users[email] && users[email].pass === pass) {
+                    user = users[email];
+                    localStorage.setItem('wp_user', JSON.stringify(user));
+                    updateAuth();
+                    closeModal();
+                    alert('✅ Logged in (Offline mode)!');
+                } else alert('❌ Invalid email or password\n\nDemo: demo@example.com / Demo123!');
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName')?.value?.trim();
+            const email = document.getElementById('signupEmail')?.value?.toLowerCase().trim();
+            const pass = document.getElementById('signupPass')?.value;
+            if(!name || !email || !pass) { alert('❌ Please fill all fields'); return; }
+            if(name.length < 2) { alert('❌ Name must be at least 2 characters'); return; }
+            if(!email.includes('@')) { alert('❌ Invalid email format'); return; }
+            if(pass.length < 6) { alert('❌ Password must be at least 6 characters'); return; }
+            try {
+                const response = await fetch(API_BASE_URL + '/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, pass })
+                });
+                const data = await response.json();
+                if(data.success) {
+                    user = { name, email };
+                    localStorage.setItem('wp_user', JSON.stringify(user));
+                    updateAuth();
+                    closeModal();
+                    alert('✅ Account created!');
+                } else alert('❌ ' + (data.error || 'Signup failed'));
+            } catch(error) {
+                const users = getUsers();
+                if(users[email]) { alert('❌ Email already registered'); return; }
+                users[email] = {name, email, pass};
+                localStorage.setItem('wp_users_db', JSON.stringify(users));
+                user = users[email];
+                localStorage.setItem('wp_user', JSON.stringify(user));
+                updateAuth();
+                closeModal();
+                alert('✅ Account created (Offline mode)!');
+            }
+        }
+
+        function handleLogout() {
+            if(confirm('Logout?')) {
+                user = null;
+                localStorage.removeItem('wp_user');
+                updateAuth();
+                alert('👋 Logged out!');
+            }
+        }
+
+        function updateAuth() {
+            const authBtns = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            if(user) {
+                authBtns.classList.add('hidden');
+                userMenu.classList.remove('hidden');
+                document.getElementById('userName').textContent = user.name;
+            } else {
+                authBtns.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+            }
+        }
+
+        // ==================== CHECKOUT ====================
+        function proceedToCheckout() {
+            if(!user) { alert('⚠️ Please log in first'); toggleCart(); openModal('login'); return; }
+            if(!cart.length) { alert('❌ Your cart is empty'); return; }
+            toggleCart();
+            openModal('checkout');
+        }
+
+        async function processOrder() {
+            const name = document.getElementById('shipName')?.value?.trim();
+            const phone = document.getElementById('shipPhone')?.value?.trim();
+            const address = document.getElementById('shipAddress')?.value?.trim();
+            const card = document.getElementById('cardNum')?.value?.trim();
+            if(!name || name.length < 2) { alert('❌ Please enter a valid shipping name'); return; }
+            if(!phone || phone.length < 7) { alert('❌ Please enter a valid phone number'); return; }
+            if(!address || address.length < 6) { alert('❌ Please enter a full shipping address'); return; }
+            if(!card || card.length < 4) { alert('❌ Please enter a valid card number'); return; }
+
+            const total = cart.reduce((s, c) => s + parseFloat(c.price) * c.qty, 0);
+            const orderId = 'ORD-' + Date.now();
+            const order = {
+                userEmail: user.email,
+                userId: user.id,
+                items: cart.map(c => ({ id: c.id, name: c.name, price: parseFloat(c.price), qty: c.qty })),
+                total: parseFloat(total.toFixed(2)),
+                shippingName: name,
+                shippingPhone: phone,
+                shippingAddress: address,
+                shippingCard: card
+            };
+
+            try {
+                const response = await fetch(API_BASE_URL + '/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                });
+                const data = await response.json();
+                if(data.success) {
+                    cart = [];
+                    localStorage.setItem('wp_cart', JSON.stringify(cart));
+                    updateCart();
+                    closeModal();
+                    alert(`✅ Order Confirmed!\n\nOrder ID: ${data.orderId}\nTotal: ${formatPrice(total)}`);
+                } else alert('❌ ' + (data.error || 'Order failed'));
+            } catch(error) {
+                const orders = JSON.parse(localStorage.getItem('wp_orders')) || [];
+                orders.push({
+                    id: orderId,
+                    user: user.email,
+                    items: order.items,
+                    total: order.total,
+                    date: new Date().toLocaleString(),
+                    status: 'Confirmed',
+                    shippingName: name,
+                    shippingPhone: phone,
+                    shippingAddress: address,
+                    shippingCard: '****' + card.slice(-4)
+                });
+                localStorage.setItem('wp_orders', JSON.stringify(orders));
+                cart = [];
+                localStorage.setItem('wp_cart', JSON.stringify(cart));
+                updateCart();
+                closeModal();
+                alert(`✅ Order Confirmed (Offline)!\n\nOrder ID: ${orderId}\nTotal: ${formatPrice(total)}`);
+            }
+        }
+
+        // ==================== MODALS ====================
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+
+            if(type === 'login') {
+                content.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4">Log In</h3>
+                    <form onsubmit="handleLogin(event)">
+                        <input type="email" id="loginEmail" placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <input type="password" id="loginPass" placeholder="Password" class="w-full px-4 py-2 border rounded-lg mb-6">
+                        <button type="submit" class="btn-primary w-full py-2 rounded text-white font-bold mb-2">Log In</button>
+                        <p class="text-sm text-gray-600 text-center">Demo: demo@example.com / Demo123!</p>
+                    </form>
+                    <p class="text-center text-gray-600 mt-4">Don't have an account? <button onclick="openModal('signup')" class="text-blue-600 font-bold">Sign Up</button></p>
+                `;
+            } else if(type === 'signup') {
+                content.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4">Create Account</h3>
+                    <form onsubmit="handleSignup(event)">
+                        <input type="text" id="signupName" placeholder="Full Name" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <input type="email" id="signupEmail" placeholder="Email" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <input type="password" id="signupPass" placeholder="Password (min 6 chars)" class="w-full px-4 py-2 border rounded-lg mb-6">
+                        <button type="submit" class="btn-primary w-full py-2 rounded text-white font-bold">Create Account</button>
+                    </form>
+                    <p class="text-center text-gray-600 mt-4">Have an account? <button onclick="openModal('login')" class="text-blue-600 font-bold">Log In</button></p>
+                `;
+            } else if(type === 'checkout') {
+                const cartItemCount = cart.reduce((s,c) => s + c.qty, 0);
+                const cartTotalPrice = cart.reduce((s,c) => s + parseFloat(c.price) * c.qty, 0);
+                content.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4">Checkout</h3>
+                    <form onsubmit="processOrder(); return false;">
+                        <input type="text" id="shipName" placeholder="Shipping Name" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <input type="tel" id="shipPhone" placeholder="Phone Number" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <textarea id="shipAddress" placeholder="Full Address" class="w-full px-4 py-2 border rounded-lg mb-4" rows="3"></textarea>
+                        <input type="text" id="cardNum" placeholder="Card Number (last 4 required)" class="w-full px-4 py-2 border rounded-lg mb-4">
+                        <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                            <p class="font-bold mb-2">Order Summary:</p>
+                            <p class="text-gray-600">Items: ${cartItemCount}</p>
+                            <p class="text-xl font-bold text-blue-600">Total: ${formatPrice(cartTotalPrice)}</p>
+                        </div>
+                        <button type="submit" class="btn-primary w-full py-2 rounded text-white font-bold">Complete Order</button>
+                    </form>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
